@@ -6,8 +6,7 @@ using IDiagnosticContext = Serilog.IDiagnosticContext;
 namespace PulseWallet.Api.ExceptionHandling;
 
 /// <summary>
-/// Catches any unhandled exception, logs it and returns an RFC 9457 problem details response.
-/// A <see cref="PulseWalletException"/> supplies its own title and detail; anything else is a 500.
+/// Turns exceptions into problem details. A <see cref="PulseWalletException"/> sets its own status, title and detail.
 /// </summary>
 internal sealed partial class GlobalExceptionHandler(
     IProblemDetailsService problemDetailsService,
@@ -35,7 +34,6 @@ internal sealed partial class GlobalExceptionHandler(
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
-                // Only expose the message while developing; never leak internals in production.
                 Detail = environment.IsDevelopment() ? exception.Message : null,
             },
         };
@@ -44,13 +42,8 @@ internal sealed partial class GlobalExceptionHandler(
 
         if (exception is PulseWalletException expectedException)
         {
-            // Expected failures are the client's problem: no stack trace, but the request log line
-            // (UseSerilogRequestLogging) says why it failed instead of only the status code.
             diagnosticContext.Set("ProblemTitle", problemDetails.Title);
             diagnosticContext.Set("ProblemDetail", problemDetails.Detail);
-
-            // The template values (WalletId, Requested, ...) as separate properties, so production logs can be
-            // searched by them instead of by the rendered text.
             foreach ((string name, object? value) in expectedException.Properties)
             {
                 diagnosticContext.Set(name, value);

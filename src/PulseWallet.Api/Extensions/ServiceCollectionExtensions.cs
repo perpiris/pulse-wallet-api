@@ -1,5 +1,10 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using PulseWallet.Api.ExceptionHandling;
+using PulseWallet.Api.OpenApi;
+using PulseWallet.Infrastructure.Identity;
+using PulseWallet.Infrastructure.Persistence;
 
 namespace PulseWallet.Api.Extensions;
 
@@ -22,7 +27,34 @@ public static class ServiceCollectionExtensions
         services.AddExceptionHandler<GlobalExceptionHandler>();
 
         services.AddControllers();
-        services.AddOpenApi();
+        services.AddOpenApi(options => options.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
+
+        return services;
+    }
+
+    /// <summary>
+    /// Identity with bearer tokens. Every endpoint requires a signed-in user unless marked [AllowAnonymous].
+    /// </summary>
+    public static IServiceCollection AddIdentityAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddAuthorizationBuilder()
+            .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build());
+
+        // Bearer tokens are ASP.NET Core's own opaque format (protected by Data Protection), not JWTs.
+        services.AddIdentityApiEndpoints<ApplicationUser>(options => options.User.RequireUniqueEmail = true)
+            .AddEntityFrameworkStores<PulseWalletDbContext>();
+
+        services.Configure<IdentityOptions>(options => configuration.GetSection("Identity:Password").Bind(options.Password));
+
+        return services;
+    }
+
+    public static IServiceCollection AddDatabaseHealthChecks(this IServiceCollection services)
+    {
+        services.AddHealthChecks()
+            .AddDbContextCheck<PulseWalletDbContext>("database");
 
         return services;
     }

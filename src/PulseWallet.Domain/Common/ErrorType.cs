@@ -1,23 +1,22 @@
 namespace PulseWallet.Domain.Common;
 
 /// <summary>
-/// What kind of failure a <see cref="PulseWalletException"/> represents. The Api layer maps it to an HTTP status code,
-/// so the inner layers never depend on HTTP.
+/// Mapped to an HTTP status code by the Api layer, so the inner layers don't depend on HTTP.
 /// </summary>
 public enum ErrorType
 {
-    /// <summary>The request itself is invalid (400).</summary>
+    /// <summary>400: the request is invalid.</summary>
     Validation,
 
-    /// <summary>The requested resource does not exist (404).</summary>
+    /// <summary>404: the resource doesn't exist.</summary>
     NotFound,
 
-    /// <summary>The request conflicts with the current state, e.g. a duplicate (409).</summary>
+    /// <summary>409: conflicts with the current state, e.g. a duplicate.</summary>
     Conflict,
 
-    /// <summary>The request is valid but breaks a business rule, e.g. insufficient funds (422).</summary>
+    /// <summary>422: valid, but breaks a business rule, e.g. insufficient funds.</summary>
     BusinessRule,
 
-    /// <summary>A dependency the request needs is temporarily unavailable (503).</summary>
+    /// <summary>503: a dependency is temporarily unavailable.</summary>
     Unavailable,
 }
