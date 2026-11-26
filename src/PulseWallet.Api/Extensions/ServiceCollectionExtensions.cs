@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using PulseWallet.Api.ExceptionHandling;
+
 namespace PulseWallet.Api.Extensions;
 
 /// <summary>
@@ -10,6 +13,14 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddApi(this IServiceCollection services)
     {
+        services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
+        {
+            HttpContext httpContext = context.HttpContext;
+            context.ProblemDetails.Instance ??= $"{httpContext.Request.Method} {httpContext.Request.Path}";
+            context.ProblemDetails.Extensions.TryAdd("traceId", Activity.Current?.Id ?? httpContext.TraceIdentifier);
+        });
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+
         services.AddControllers();
         services.AddOpenApi();
 
