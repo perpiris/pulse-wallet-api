@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig"/>
+    <File Path=".gitattributes"/>
+    <File Path=".gitignore"/>
+    <File Path="Directory.Build.props"/>
+    <File Path="Directory.Packages.props"/>
+    <File Path="global.json"/>
+    <File Path="README.md"/>
+  </Folder>
+  <Folder Name="/.github/">
+    <File Path=".github/dependabot.yml"/>
+  </Folder>
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/ci.yml"/>
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PulseWallet.Api/PulseWallet.Api.csproj"/>
+    <Project Path="src/PulseWallet.Application/PulseWallet.Application.csproj"/>
+    <Project Path="src/PulseWallet.Domain/PulseWallet.Domain.csproj"/>
+    <Project Path="src/PulseWallet.Infrastructure/PulseWallet.Infrastructure.csproj"/>
+  </Folder>
+</Solution>
