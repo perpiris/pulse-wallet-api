@@ -8,9 +8,6 @@ namespace PulseWallet.Api.Extensions;
 /// </summary>
 public static class WebApplicationBuilderExtensions
 {
-    /// <summary>
-    /// Replaces the default logging with Serilog: readable console output in Development, compact JSON elsewhere.
-    /// </summary>
     public static WebApplicationBuilder AddSerilogLogging(this WebApplicationBuilder builder)
     {
         builder.Services.AddSerilog((serviceProvider, config) => config

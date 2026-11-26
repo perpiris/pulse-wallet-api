@@ -25,3 +25,11 @@ jobs:
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
+
+      - name: Check for missing migrations
+        run: |
+          dotnet tool restore
+          dotnet ef migrations has-pending-model-changes --no-build --configuration Release --project src/PulseWallet.Infrastructure --startup-project src/PulseWallet.Api
+        env:
+          # The app requires a connection string at startup; this check never connects.
+          ConnectionStrings__PulseWallet: Server=unused;Database=unused

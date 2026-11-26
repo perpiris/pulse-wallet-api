@@ -4,8 +4,6 @@ using PulseWallet.Application.Extensions;
 using PulseWallet.Infrastructure.Extensions;
 using Serilog;
 
-// Logs startup failures until the real logger is built. The host environment isn't known yet, so read it the way
-// the host will: ASPNETCORE_ENVIRONMENT, then DOTNET_ENVIRONMENT, and Production when neither is set.
 string environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
     ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
     ?? Environments.Production;
@@ -21,18 +19,22 @@ try
     builder.AddSerilogLogging();
 
     builder.Services.AddApi();
+    builder.Services.AddIdentityAuthentication(builder.Configuration);
+    builder.Services.AddDatabaseHealthChecks();
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
 
     WebApplication app = builder.Build();
 
+    await app.ApplyMigrationsInDevelopmentAsync();
+
     app.UseApi();
 
-    app.Run();
+    await app.RunAsync();
 
     return 0;
 }
-catch (Exception exception)
+catch (Exception exception) when (exception is not HostAbortedException)
 {
     Log.Fatal(exception, "PulseWallet API terminated unexpectedly");
     return 1;

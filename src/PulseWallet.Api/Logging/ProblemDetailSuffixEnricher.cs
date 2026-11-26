@@ -4,8 +4,7 @@ using Serilog.Events;
 namespace PulseWallet.Api.Logging;
 
 /// <summary>
-/// Adds "ProblemDetailSuffix" (a space plus the ProblemDetail) to events that have a ProblemDetail, so the console
-/// template can append the failure reason to a line without leaving a trailing space on every other line.
+/// Adds " " + ProblemDetail, so the console template only gets a space on lines that have a detail.
 /// </summary>
 internal sealed class ProblemDetailSuffixEnricher : ILogEventEnricher
 {
