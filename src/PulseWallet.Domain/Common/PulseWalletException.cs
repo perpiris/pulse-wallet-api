@@ -61,6 +61,20 @@ public abstract partial class PulseWalletException : Exception
 
     public string Detail => Message;
 
+    /// <summary>
+    /// Stable identifier clients can check, e.g. "WalletNotFound". Defaults to the class name without "Exception";
+    /// override it once a client depends on it, so renaming the class can't change it.
+    /// </summary>
+    public virtual string Code
+    {
+        get
+        {
+            const string suffix = "Exception";
+            string name = GetType().Name;
+            return name.EndsWith(suffix, StringComparison.Ordinal) ? name[..^suffix.Length] : name;
+        }
+    }
+
     private static (string Message, Dictionary<string, object?> Properties) Render(string template, object?[] arguments)
     {
         Dictionary<string, object?> properties = [];

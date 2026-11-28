@@ -26,6 +26,7 @@ internal sealed partial class GlobalExceptionHandler(
                 Status = ToStatusCode(expected.ErrorType),
                 Title = expected.Title,
                 Detail = expected.Detail,
+                Extensions = { ["code"] = expected.Code },
             },
             BadHttpRequestException badRequest => new ProblemDetails
             {
@@ -42,6 +43,7 @@ internal sealed partial class GlobalExceptionHandler(
 
         if (exception is PulseWalletException expectedException)
         {
+            diagnosticContext.Set("ProblemCode", expectedException.Code);
             diagnosticContext.Set("ProblemTitle", problemDetails.Title);
             diagnosticContext.Set("ProblemDetail", problemDetails.Detail);
             foreach ((string name, object? value) in expectedException.Properties)
